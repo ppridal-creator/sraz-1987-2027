@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sraz spolužáků po 40 letech | 1987–2027</title>
+  <meta name="description" content="Sraz spolužáků po 40 letech od ukončení studia – duben 2027.">
+  <style>
+    :root {
+      --bg: #f3efe6;
+      --paper: #fffdf8;
+      --ink: #24303a;
+      --accent: #8b2e2e;
+      --accent2: #c69b5a;
+      --line: #d9cfbd;
+      --muted: #6e756f;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background:
+        linear-gradient(rgba(255,255,255,.55), rgba(255,255,255,.55)),
+        repeating-linear-gradient(
+          0deg,
+          #ece5d7 0px,
+          #ece5d7 1px,
+          #f5f1e8 1px,
+          #f5f1e8 28px
+        );
+      color: var(--ink);
+      line-height: 1.6;
+    }
+
+    .wrap {
+      width: min(1080px, 92%);
+      margin: 0 auto;
+    }
+
+    header {
+      padding: 22px 0;
+      background: rgba(255, 253, 248, .92);
+      border-bottom: 1px solid var(--line);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(8px);
+    }
+
+    .nav {
+      display: flex;
+      gap: 18px;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      font-weight: 800;
+      letter-spacing: .4px;
+      color: var(--accent);
+    }
+
+    nav a {
+      color: var(--ink);
+      text-decoration: none;
+      margin-left: 18px;
+      font-weight: 700;
+      font-size: .95rem;
+    }
+
+    nav a:hover { color: var(--accent); }
+
+    .hero {
+      padding: 88px 0 64px;
+      text-align: center;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 8px 14px;
+      border: 1px solid var(--accent2);
+      border-radius: 999px;
+      background: #fff8e9;
+      font-weight: 700;
+      color: #6d5128;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(2.5rem, 6vw, 5.2rem);
+      line-height: 1.05;
+      margin: 0 0 14px;
+      color: var(--accent);
+    }
+
+    .subtitle {
+      font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+      font-weight: 700;
+      margin-bottom: 18px;
+    }
+
+    .lead {
+      max-width: 760px;
+      margin: 0 auto 28px;
+      font-size: 1.12rem;
+      color: #4e575e;
+    }
+
+    .cta {
+      display: inline-block;
+      padding: 15px 24px;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 800;
+      box-shadow: 0 8px 20px rgba(139,46,46,.18);
+    }
+
+    .cta:hover { transform: translateY(-1px); }
+
+    .hero-card {
+      margin: 48px auto 0;
+      max-width: 900px;
+      min-height: 360px;
+      border: 10px solid #f8f2e7;
+      outline: 1px solid #cbbda7;
+      background:
+        linear-gradient(rgba(50,50,50,.10), rgba(50,50,50,.10)),
+        url('trida-1987.jpg') center/cover no-repeat,
+        #d8d0c2;
+      display: grid;
+      place-items: end center;
+      border-radius: 4px;
+      box-shadow: 0 16px 40px rgba(0,0,0,.12);
+      overflow: hidden;
+    }
+
+    .photo-note {
+      width: 100%;
+      padding: 14px 18px;
+      background: rgba(20,20,20,.65);
+      color: #fff;
+      font-size: .95rem;
+    }
+
+    section {
+      padding: 64px 0;
+    }
+
+    .section-title {
+      font-family: Georgia, "Times New Roman", serif;
+      color: var(--accent);
+      font-size: 2.1rem;
+      margin: 0 0 14px;
+      text-align: center;
+    }
+
+    .section-intro {
+      text-align: center;
+      max-width: 760px;
+      margin: 0 auto 34px;
+      color: var(--muted);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 26px;
+      box-shadow: 0 10px 24px rgba(0,0,0,.05);
+    }
+
+    .card h3 {
+      margin-top: 0;
+      color: var(--accent);
+    }
+
+    .big {
+      font-size: 1.15rem;
+      font-weight: 800;
+    }
+
+    .notice {
+      background: #fff7e7;
+      border-left: 5px solid var(--accent2);
+      padding: 18px 20px;
+      margin-top: 24px;
+      border-radius: 8px;
+    }
+
+    .countdown {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-top: 30px;
+    }
+
+    .count-box {
+      min-width: 120px;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    .count-box strong {
+      display: block;
+      font-size: 2rem;
+      color: var(--accent);
+    }
+
+    .register {
+      text-align: center;
+      background: #efe7d8;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .register .cta {
+      margin-top: 10px;
+    }
+
+    footer {
+      padding: 30px 0 40px;
+      text-align: center;
+      color: var(--muted);
+      font-size: .92rem;
+    }
+
+    @media (max-width: 820px) {
+      .grid { grid-template-columns: 1fr; }
+      nav { width: 100%; }
+      nav a { margin: 0 12px 0 0; display: inline-block; }
+      .hero { padding-top: 56px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <div class="brand">SRAZ 1987–2027</div>
+    <nav>
+      <a href="#o-srazu">O srazu</a>
+      <a href="#informace">Informace</a>
+      <a href="#registrace">Registrace</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="wrap">
+      <div class="badge">40 let od ukončení studia</div>
+      <h1>Sraz spolužáků</h1>
+      <div class="subtitle">1987–2027</div>
+      <p class="lead">
+        Je to neuvěřitelné, ale od ukončení našeho studia uplyne už 40 let.
+        Pojďme se znovu sejít, zavzpomínat na školní léta a zjistit, kam nás život za tu dobu zavedl.
+      </p>
+
+      <a class="cta" href="#registrace">Přihlásit se na sraz</a>
+
+      <div class="hero-card">
+        <div class="photo-note">
+          Sem vložte společnou nebo třídní fotografii pod názvem <strong>trida-1987.jpg</strong>.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="o-srazu">
+    <div class="wrap">
+      <h2 class="section-title">Po čtyřiceti letech znovu spolu</h2>
+      <p class="section-intro">
+        Připravujeme společné setkání bývalých spolužáků při příležitosti 40. výročí ukončení studia.
+        Přesné údaje budeme postupně doplňovat podle dohody a počtu přihlášených.
+      </p>
+
+      <div class="grid">
+        <div class="card">
+          <h3>📅 Termín</h3>
+          <p class="big">Duben 2027</p>
+          <p>Přesné datum bude doplněno.</p>
+        </div>
+
+        <div class="card">
+          <h3>📍 Místo</h3>
+          <p class="big">Bude upřesněno</p>
+          <p>Vybereme podle počtu účastníků a dostupnosti.</p>
+        </div>
+
+        <div class="card">
+          <h3>🍽️ Program</h3>
+          <p class="big">Setkání, večeře, vzpomínky</p>
+          <p>A hlavně dost času na povídání a společné fotografie.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="informace">
+    <div class="wrap">
+      <h2 class="section-title">Kolik času zbývá?</h2>
+      <p class="section-intro">
+        Odpočítávání je zatím orientačně nastaveno na 17. dubna 2027. Po potvrzení termínu stačí změnit jedno datum v kódu.
+      </p>
+
+      <div class="countdown">
+        <div class="count-box"><strong id="days">–</strong>dní</div>
+        <div class="count-box"><strong id="hours">–</strong>hodin</div>
+        <div class="count-box"><strong id="minutes">–</strong>minut</div>
+      </div>
+
+      <div class="notice">
+        Máte kontakt na spolužáka, kterého jsme zatím neoslovili? Pošlete mu prosím odkaz na tuto stránku.
+      </div>
+    </div>
+  </section>
+
+  <section class="register" id="registrace">
+    <div class="wrap">
+      <h2 class="section-title">Registrace na sraz</h2>
+      <p class="section-intro">
+        Prosíme, vyplňte krátký registrační formulář. Pomůže nám zjistit předběžný počet účastníků
+        a následně rozeslat další organizační informace.
+      </p>
+
+      <div style="max-width:900px; margin:0 auto 24px; background:#fffdf8; border:1px solid #d9cfbd; border-radius:14px; overflow:hidden; box-shadow:0 10px 24px rgba(0,0,0,.06);">
+        <iframe
+          src="https://docs.google.com/forms/d/e/1FAIpQLSfWgJqjPyCrSeK4Gkxi7aUDEQvbJpmsi9p72vakfLbYMFnILw/viewform?embedded=true"
+          width="100%"
+          height="1550"
+          frameborder="0"
+          marginheight="0"
+          marginwidth="0"
+          title="Registrace na sraz spolužáků 1987–2027">
+          Načítání…
+        </iframe>
+      </div>
+
+      <a class="cta"
+         href="https://docs.google.com/forms/d/e/1FAIpQLSfWgJqjPyCrSeK4Gkxi7aUDEQvbJpmsi9p72vakfLbYMFnILw/viewform"
+         target="_blank"
+         rel="noopener">
+         Otevřít formulář v nové kartě
+      </a>
+
+      <p style="margin-top:18px; color:#6e756f;">
+        Registrace slouží pouze pro organizaci tohoto setkání.
+      </p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    Sraz spolužáků 1987–2027 • 40 let od ukončení studia
+  </div>
+</footer>
+
+<script>
+  // Orientační datum srazu. Po potvrzení termínu změňte tento řádek:
+  const reunionDate = new Date("2027-04-17T17:00:00");
+
+  function updateCountdown() {
+    const now = new Date();
+    const diff = reunionDate - now;
+
+    if (diff <= 0) {
+      document.getElementById("days").textContent = "0";
+      document.getElementById("hours").textContent = "0";
+      document.getElementById("minutes").textContent = "0";
+      return;
+    }
+
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    const minutes = Math.floor((diff / (1000 * 60)) % 60);
+
+    document.getElementById("days").textContent = days;
+    document.getElementById("hours").textContent = hours;
+    document.getElementById("minutes").textContent = minutes;
+  }
+
+  updateCountdown();
+  setInterval(updateCountdown, 60000);
+</script>
+
+</body>
+</html>
