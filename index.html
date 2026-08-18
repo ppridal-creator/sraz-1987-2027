@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sraz spolužáků po 40 letech | 1987–2027</title>
-  <meta name="description" content="Sraz spolužáků po 40 letech od ukončení studia – 17. duben 2027.">
+  <meta name="description" content="Sraz spolužáků po 40 letech od ukončení studia – duben 2027.">
   <style>
     :root {
       --bg: #f3efe6;
@@ -224,6 +224,71 @@
       color: var(--accent);
     }
 
+
+    .attendees {
+      background: rgba(255, 253, 248, .72);
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .attendee-summary {
+      display: flex;
+      justify-content: center;
+      margin: 26px 0 30px;
+    }
+
+    .attendee-count {
+      min-width: 220px;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 20px 28px;
+      text-align: center;
+      box-shadow: 0 10px 24px rgba(0,0,0,.05);
+    }
+
+    .attendee-count strong {
+      display: block;
+      font-size: 2.3rem;
+      color: var(--accent);
+      line-height: 1.1;
+    }
+
+    .attendee-list {
+      max-width: 820px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    .attendee-item {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 16px 18px;
+      font-weight: 700;
+      box-shadow: 0 6px 16px rgba(0,0,0,.04);
+    }
+
+    .attendee-oldname {
+      display: block;
+      color: var(--muted);
+      font-size: .9rem;
+      font-weight: 400;
+      margin-top: 2px;
+    }
+
+    .attendee-status {
+      text-align: center;
+      color: var(--muted);
+      padding: 16px;
+    }
+
+    @media (max-width: 650px) {
+      .attendee-list { grid-template-columns: 1fr; }
+    }
+
     .register {
       text-align: center;
       background: #efe7d8;
@@ -258,6 +323,7 @@
     <nav>
       <a href="#o-srazu">O srazu</a>
       <a href="#informace">Informace</a>
+      <a href="#kdo-prijde">Kdo přijde</a>
       <a href="#registrace">Registrace</a>
     </nav>
   </div>
@@ -295,7 +361,7 @@
       <div class="grid">
         <div class="card">
           <h3>📅 Termín</h3>
-          <p class="big">17. duben 2027</p>
+          <p class="big">Duben 2027</p>
           <p>Přesné datum bude doplněno.</p>
         </div>
 
@@ -330,6 +396,30 @@
       <div class="notice">
         Máte kontakt na spolužáka, kterého jsme zatím neoslovili? Pošlete mu prosím odkaz na tuto stránku.
       </div>
+    </div>
+  </section>
+
+
+  <section class="attendees" id="kdo-prijde">
+    <div class="wrap">
+      <h2 class="section-title">👥 Kdo přijde</h2>
+      <p class="section-intro">
+        Seznam se aktualizuje automaticky podle registrací. Zobrazují se pouze spolužáci,
+        kteří potvrdili účast a souhlasili se zveřejněním svého jména.
+      </p>
+
+      <div class="attendee-summary">
+        <div class="attendee-count">
+          <strong id="attendee-count">–</strong>
+          přihlášených spolužáků
+        </div>
+      </div>
+
+      <div id="attendee-list" class="attendee-list">
+        <div class="attendee-status">Načítám seznam přihlášených…</div>
+      </div>
+
+      <p id="attendee-updated" class="section-intro" style="margin-top:24px; font-size:.9rem;"></p>
     </div>
   </section>
 
@@ -400,6 +490,65 @@
 
   updateCountdown();
   setInterval(updateCountdown, 60000);
+
+  // Automatický seznam "Kdo přijde" z Google Apps Scriptu
+  const attendeesApiUrl = "https://script.google.com/macros/s/AKfycbxEIHf4VDt7isO9cVK1DWQ92q_fnH-BmCu_fQ0yn3ZMo9lxx_8jQcLaxVz8Sy9yIUTA/exec";
+
+  function srazCallback(data) {
+    const countEl = document.getElementById("attendee-count");
+    const listEl = document.getElementById("attendee-list");
+    const updatedEl = document.getElementById("attendee-updated");
+
+    if (!data || !Array.isArray(data.people)) {
+      countEl.textContent = "0";
+      listEl.innerHTML = '<div class="attendee-status">Seznam se nepodařilo načíst.</div>';
+      return;
+    }
+
+    countEl.textContent = data.count ?? data.people.length;
+
+    if (data.people.length === 0) {
+      listEl.innerHTML = '<div class="attendee-status">Zatím zde není žádný veřejně zobrazený přihlášený.</div>';
+    } else {
+      listEl.innerHTML = data.people.map(person => {
+        const oldName = person.oldName
+          ? `<span class="attendee-oldname">v době studia: ${escapeHtml(person.oldName)}</span>`
+          : "";
+
+        return `<div class="attendee-item">${escapeHtml(person.name)}${oldName}</div>`;
+      }).join("");
+    }
+
+    if (data.updated) {
+      const d = new Date(data.updated);
+      if (!isNaN(d)) {
+        updatedEl.textContent = "Aktualizováno: " + d.toLocaleString("cs-CZ");
+      }
+    }
+  }
+
+  function escapeHtml(value) {
+    return String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  function loadAttendees() {
+    const script = document.createElement("script");
+    script.src = attendeesApiUrl + "?callback=srazCallback&t=" + Date.now();
+    script.async = true;
+    script.onerror = function() {
+      document.getElementById("attendee-list").innerHTML =
+        '<div class="attendee-status">Seznam přihlášených se nyní nepodařilo načíst.</div>';
+    };
+    document.body.appendChild(script);
+  }
+
+  loadAttendees();
+
 </script>
 
 </body>
