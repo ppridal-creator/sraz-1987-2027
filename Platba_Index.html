@@ -1,0 +1,1248 @@
+# Finální platební sekce – Sraz 1987–2027
+
+Do HTML stránky vložte následující kód. Hodnotu `XXXXXXXXXX/2010` později nahraďte skutečným číslem transparentního účtu.
+
+```html
+<!-- =========================================================
+     SRAZ 1987–2027 – PLATBA + QR + STAV ZAPLACENO
+     ========================================================= -->
+
+<!-- Knihovna pro vytvoření QR kódu -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<section id="platba" class="payment-section">
+
+  <div class="payment-card">
+
+    <h2>💳 Příspěvek na sraz</h2>
+
+    <p class="payment-intro">
+      Příspěvek slouží na úhradu nákladů spojených se srazem
+      – rezervace restaurace, úvodní občerstvení a dalších společných výdajů.
+    </p>
+
+    <div class="payment-info">
+
+      <div class="payment-row">
+        <span>Částka předběžně:</span>
+        <strong id="paymentAmount">200 Kč / osoba</strong>
+      </div>
+
+      <div class="payment-row">
+        <span>Číslo účtu:</span>
+        <strong id="account-number">2700083483/2010</strong>
+      </div>
+
+      <div class="payment-row">
+        <span>Banka:</span>
+        <strong>Fio banka</strong>
+      </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         JMÉNO PLÁTCE
+         ===================================================== -->
+
+    <div class="payer-section">
+
+      <label for="payerName">
+        <strong>Jméno a příjmení:</strong>
+      </label>
+
+      <input
+        type="text"
+        id="payerName"
+        placeholder="např. Pavel Přidal"
+        maxlength="60"
+        oninput="generatePaymentQR()"
+      >
+
+      <p class="payer-help">
+        Jméno se vloží do zprávy pro příjemce a pomůže nám
+        platbu správně přiřadit.
+      </p>
+
+    </div>
+
+
+    <!-- =====================================================
+         QR PLATBA
+         ===================================================== -->
+
+    <div class="qr-section">
+
+      <h3>📱 Zaplatit pomocí QR kódu</h3>
+
+      <div id="paymentQR"></div>
+
+      <p class="qr-help">
+        QR kód načtěte v mobilní aplikaci své banky.
+      </p>
+
+    </div>
+
+
+    <!-- =====================================================
+         TLAČÍTKA
+         ===================================================== -->
+
+    <div class="payment-buttons">
+
+      <button
+        type="button"
+        class="btn-copy"
+        onclick="copyAccount()">
+        📋 Zkopírovat číslo účtu
+      </button>
+
+      <a
+        id="transparentAccountLink"
+        href="#"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="btn-transparent">
+        👁 Transparentní účet
+      </a>
+
+    </div>
+
+
+    <div class="payment-status-info">
+
+      ✅ Po přijetí platby bude u vašeho jména v seznamu
+      <strong>Kdo přijde</strong> uvedeno
+
+      <span class="paid-badge">
+        ✓ ZAPLACENO
+      </span>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+
+<!-- =========================================================
+     SEZNAM ÚČASTNÍKŮ
+     ========================================================= -->
+
+<section id="ucastnici" class="participants-section">
+
+  <h2>👥 Kdo přijde</h2>
+
+  <div class="participants-table-wrapper">
+
+    <table class="participants-table">
+
+      <thead>
+
+        <tr>
+          <th>Jméno</th>
+          <th>Účast</th>
+          <th>Příspěvek</th>
+        </tr>
+
+      </thead>
+
+      <tbody id="participantsBody">
+
+        <tr>
+          <td colspan="3" class="loading">
+            Načítám seznam...
+          </td>
+        </tr>
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+</section>
+
+
+
+<style>
+
+/* =========================================================
+   PLATEBNÍ SEKCE
+   ========================================================= */
+
+.payment-section {
+
+  max-width: 760px;
+  margin: 45px auto;
+  padding: 0 15px;
+
+}
+
+
+.payment-card {
+
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 30px;
+
+  box-shadow:
+    0 8px 25px rgba(0,0,0,0.12);
+
+}
+
+
+.payment-card h2 {
+
+  text-align: center;
+  margin-top: 0;
+  font-size: 30px;
+
+}
+
+
+.payment-intro {
+
+  text-align: center;
+
+  font-size: 17px;
+  line-height: 1.6;
+
+  margin-bottom: 25px;
+
+}
+
+
+.payment-info {
+
+  border-top: 1px solid #ddd;
+
+}
+
+
+.payment-row {
+
+  display: flex;
+
+  justify-content: space-between;
+
+  gap: 20px;
+
+  padding: 13px 5px;
+
+  border-bottom: 1px solid #ddd;
+
+}
+
+
+.payment-row span {
+
+  color: #666;
+
+}
+
+
+/* JMÉNO */
+
+.payer-section {
+
+  margin-top: 25px;
+
+}
+
+
+.payer-section label {
+
+  display: block;
+  margin-bottom: 8px;
+
+}
+
+
+#payerName {
+
+  width: 100%;
+  box-sizing: border-box;
+
+  padding: 13px 14px;
+
+  border: 1px solid #bbb;
+
+  border-radius: 9px;
+
+  font-size: 16px;
+
+}
+
+
+#payerName:focus {
+
+  outline: none;
+
+  border-color: #2980b9;
+
+  box-shadow:
+    0 0 0 2px rgba(41,128,185,0.15);
+
+}
+
+
+.payer-help {
+
+  margin-top: 7px;
+
+  color: #666;
+
+  font-size: 14px;
+
+}
+
+
+/* QR */
+
+.qr-section {
+
+  text-align: center;
+
+  margin-top: 30px;
+
+}
+
+
+#paymentQR {
+
+  display: flex;
+
+  justify-content: center;
+
+  margin: 20px auto;
+
+  min-height: 220px;
+
+}
+
+
+#paymentQR img,
+#paymentQR canvas {
+
+  border-radius: 8px;
+
+}
+
+
+.qr-help {
+
+  color: #666;
+
+}
+
+
+/* TLAČÍTKA */
+
+.payment-buttons {
+
+  margin-top: 25px;
+
+  display: flex;
+
+  justify-content: center;
+
+  gap: 12px;
+
+  flex-wrap: wrap;
+
+}
+
+
+.btn-copy,
+.btn-transparent {
+
+  display: inline-block;
+
+  padding: 13px 20px;
+
+  border-radius: 9px;
+
+  border: none;
+
+  cursor: pointer;
+
+  text-decoration: none;
+
+  font-size: 16px;
+
+  font-weight: bold;
+
+}
+
+
+.btn-copy {
+
+  background: #eeeeee;
+  color: #222;
+
+}
+
+
+.btn-transparent {
+
+  background: #1b7f3a;
+  color: #ffffff;
+
+}
+
+
+.btn-copy:hover,
+.btn-transparent:hover {
+
+  opacity: 0.85;
+
+}
+
+
+/* INFORMACE */
+
+.payment-status-info {
+
+  margin-top: 25px;
+
+  text-align: center;
+
+  padding: 15px;
+
+  background: #eaf8ee;
+
+  border-radius: 10px;
+
+  line-height: 1.6;
+
+}
+
+
+.paid-badge {
+
+  display: inline-block;
+
+  margin-left: 5px;
+
+  padding: 4px 9px;
+
+  background: #dff4e4;
+
+  color: #176b31;
+
+  border-radius: 7px;
+
+  font-weight: bold;
+
+}
+
+
+
+/* =========================================================
+   ÚČASTNÍCI
+   ========================================================= */
+
+.participants-section {
+
+  max-width: 850px;
+
+  margin: 50px auto;
+
+  padding: 0 15px;
+
+}
+
+
+.participants-section h2 {
+
+  text-align: center;
+
+}
+
+
+.participants-table-wrapper {
+
+  overflow-x: auto;
+
+}
+
+
+.participants-table {
+
+  width: 100%;
+
+  border-collapse: collapse;
+
+  background: white;
+
+  border-radius: 12px;
+
+  overflow: hidden;
+
+  box-shadow:
+    0 5px 18px rgba(0,0,0,0.08);
+
+}
+
+
+.participants-table th {
+
+  background: #f1f3f5;
+
+  text-align: left;
+
+  padding: 13px;
+
+}
+
+
+.participants-table td {
+
+  padding: 13px;
+
+  border-top: 1px solid #e3e3e3;
+
+}
+
+
+.status-paid {
+
+  display: inline-block;
+
+  padding: 5px 10px;
+
+  border-radius: 7px;
+
+  background: #dff4e4;
+
+  color: #176b31;
+
+  font-weight: bold;
+
+}
+
+
+.status-unpaid {
+
+  display: inline-block;
+
+  padding: 5px 10px;
+
+  border-radius: 7px;
+
+  background: #fff2d8;
+
+  color: #8a5900;
+
+  font-weight: bold;
+
+}
+
+
+.status-coming {
+
+  font-weight: bold;
+
+  color: #176b31;
+
+}
+
+
+.loading {
+
+  text-align: center;
+
+  color: #777;
+
+}
+
+
+
+/* =========================================================
+   MOBIL
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+  .payment-card {
+
+    padding: 20px;
+
+  }
+
+
+  .payment-row {
+
+    flex-direction: column;
+
+    gap: 4px;
+
+  }
+
+
+  .participants-table {
+
+    font-size: 14px;
+
+  }
+
+
+  .participants-table th,
+  .participants-table td {
+
+    padding: 10px 7px;
+
+  }
+
+}
+
+</style>
+
+
+
+<script>
+
+/* =========================================================
+   KONFIGURACE
+   ========================================================= */
+
+
+/*
+  ZDE POZDĚJI VYMĚŇTE ČÍSLO ÚČTU.
+  Formát může být například:
+
+  2700083483/2010
+
+  nebo s předčíslím:
+
+  123456-1234567890/2010
+*/
+
+const ACCOUNT_NUMBER = "2700083483/2010";
+
+
+/* Předběžný příspěvek */
+
+const PAYMENT_AMOUNT = 200;
+
+
+/*
+  Existující Google Apps Script
+  používaný webem srazu.
+*/
+
+const PARTICIPANTS_API =
+"https://script.google.com/macros/s/AKfycbxEIHf4VDt7isO9cVK1DWQ92q_fnH-BmCu_fQ0yn3ZMo9lxx_8jQcLaxVz8Sy9yIUTA/exec";
+
+
+
+/* =========================================================
+   KOPÍROVÁNÍ ÚČTU
+   ========================================================= */
+
+function copyAccount() {
+
+  navigator.clipboard
+    .writeText(ACCOUNT_NUMBER)
+    .then(() => {
+
+      alert(
+        "Číslo účtu " +
+        ACCOUNT_NUMBER +
+        " bylo zkopírováno."
+      );
+
+    });
+
+}
+
+
+
+/* =========================================================
+   ČESKÉ ČÍSLO ÚČTU -> IBAN
+   ========================================================= */
+
+function accountToCzechIBAN(account) {
+
+  if (
+    !account ||
+    account.includes("X")
+  ) {
+
+    return null;
+
+  }
+
+
+  account =
+    account
+      .replace(/\s/g, "");
+
+
+  const parts =
+    account.split("/");
+
+
+  if (parts.length !== 2) {
+
+    return null;
+
+  }
+
+
+  const bankCode =
+    parts[1]
+      .padStart(4, "0");
+
+
+  let prefix = "0";
+  let number = parts[0];
+
+
+  if (number.includes("-")) {
+
+    const accountParts =
+      number.split("-");
+
+    prefix =
+      accountParts[0];
+
+    number =
+      accountParts[1];
+
+  }
+
+
+  prefix =
+    prefix.padStart(6, "0");
+
+
+  number =
+    number.padStart(10, "0");
+
+
+  /*
+    BBAN pro Českou republiku:
+
+    bank code 4
+    prefix    6
+    account  10
+  */
+
+  const bban =
+    bankCode +
+    prefix +
+    number;
+
+
+  /*
+    CZ = 12 35
+
+    Pro výpočet kontrolních číslic:
+
+    BBAN + 123500
+  */
+
+  const checkString =
+    bban +
+    "123500";
+
+
+  let remainder = 0;
+
+
+  for (
+    let i = 0;
+    i < checkString.length;
+    i++
+  ) {
+
+    remainder =
+      (
+        remainder * 10 +
+        Number(checkString[i])
+      ) % 97;
+
+  }
+
+
+  const checkDigits =
+    String(
+      98 - remainder
+    ).padStart(2, "0");
+
+
+  return (
+    "CZ" +
+    checkDigits +
+    bban
+  );
+
+}
+
+
+
+/* =========================================================
+   OČIŠTĚNÍ TEXTU PRO QR
+   ========================================================= */
+
+function sanitizePaymentText(text) {
+
+  return text
+    .replace(/\*/g, "")
+    .replace(/:/g, " ")
+    .trim()
+    .substring(0, 60);
+
+}
+
+
+
+/* =========================================================
+   GENEROVÁNÍ QR PLATBY
+   ========================================================= */
+
+function generatePaymentQR() {
+
+  const qrElement =
+    document.getElementById(
+      "paymentQR"
+    );
+
+
+  qrElement.innerHTML = "";
+
+
+  const iban =
+    accountToCzechIBAN(
+      ACCOUNT_NUMBER
+    );
+
+
+  if (!iban) {
+
+    qrElement.innerHTML =
+      "<p style='color:#777'>" +
+      "QR platba se zobrazí po doplnění skutečného čísla účtu." +
+      "</p>";
+
+    return;
+
+  }
+
+
+  let payerName =
+    document
+      .getElementById("payerName")
+      .value
+      .trim();
+
+
+  let message =
+    "Sraz 1987-2027";
+
+
+  if (payerName) {
+
+    message +=
+      " - " +
+      payerName;
+
+  }
+
+
+  message =
+    sanitizePaymentText(
+      message
+    );
+
+
+  /*
+    Český formát QR platby SPAYD
+  */
+
+  const spayd =
+    "SPD*1.0" +
+    "*ACC:" + iban +
+    "*AM:" + PAYMENT_AMOUNT.toFixed(2) +
+    "*CC:CZK" +
+    "*MSG:" + message;
+
+
+  new QRCode(
+    qrElement,
+    {
+
+      text: spayd,
+
+      width: 220,
+
+      height: 220,
+
+      correctLevel:
+        QRCode.CorrectLevel.M
+
+    }
+  );
+
+}
+
+
+
+/* =========================================================
+   NAČTENÍ SEZNAMU ÚČASTNÍKŮ
+   ========================================================= */
+
+async function loadParticipants() {
+
+  const body =
+    document.getElementById(
+      "participantsBody"
+    );
+
+
+  try {
+
+    const response =
+      await fetch(
+        PARTICIPANTS_API,
+        {
+          cache: "no-store"
+        }
+      );
+
+
+    if (!response.ok) {
+
+      throw new Error(
+        "HTTP " +
+        response.status
+      );
+
+    }
+
+
+    const result =
+      await response.json();
+
+
+    /*
+      Apps Script může vracet přímo pole:
+
+      [...]
+
+      nebo například:
+
+      {
+        data: [...]
+      }
+    */
+
+    let participants =
+      Array.isArray(result)
+        ? result
+        : (
+            result.data ||
+            result.participants ||
+            result.ucastnici ||
+            []
+          );
+
+
+    if (
+      !Array.isArray(participants) ||
+      participants.length === 0
+    ) {
+
+      body.innerHTML =
+
+        "<tr>" +
+        "<td colspan='3' class='loading'>" +
+        "Zatím nejsou evidováni žádní účastníci." +
+        "</td>" +
+        "</tr>";
+
+      return;
+
+    }
+
+
+    body.innerHTML = "";
+
+
+    participants.forEach(
+      person => {
+
+        /*
+          Podpora více variant názvů sloupců.
+        */
+
+        const name =
+          person.Jmeno ||
+          person.JMENO ||
+          person.jmeno ||
+          person.name ||
+          person.Name ||
+          person["Jméno"] ||
+          person["Jméno a příjmení"] ||
+          person["Jmeno a prijmeni"] ||
+          "";
+
+
+        const attendance =
+          person.Ucast ||
+          person.UCAST ||
+          person.ucast ||
+          person["Účast"] ||
+          person.status ||
+          "ANO";
+
+
+        const payment =
+          person.ZAPLACENO ||
+          person.Zaplaceno ||
+          person.zaplaceno ||
+          person.paid ||
+          person.PAID ||
+          "";
+
+
+        const paid =
+          isPaid(payment);
+
+
+        const row =
+          document.createElement(
+            "tr"
+          );
+
+
+        row.innerHTML =
+
+          "<td>" +
+          escapeHtml(name) +
+          "</td>" +
+
+          "<td>" +
+          "<span class='status-coming'>" +
+          "✓ přijde" +
+          "</span>" +
+          "</td>" +
+
+          "<td>" +
+
+          (
+            paid
+
+            ?
+
+            "<span class='status-paid'>" +
+            "✓ ZAPLACENO" +
+            "</span>"
+
+            :
+
+            "<span class='status-unpaid'>" +
+            "⏳ NEZAPLACENO" +
+            "</span>"
+          )
+
+          +
+
+          "</td>";
+
+
+        body.appendChild(
+          row
+        );
+
+      }
+    );
+
+
+  }
+
+  catch (error) {
+
+    console.error(
+      "Chyba při načítání účastníků:",
+      error
+    );
+
+
+    body.innerHTML =
+
+      "<tr>" +
+      "<td colspan='3' class='loading'>" +
+      "Seznam účastníků se nyní nepodařilo načíst." +
+      "</td>" +
+      "</tr>";
+
+  }
+
+}
+
+
+
+/* =========================================================
+   VYHODNOCENÍ ZAPLACENO
+   ========================================================= */
+
+function isPaid(value) {
+
+  if (
+    value === true ||
+    value === 1
+  ) {
+
+    return true;
+
+  }
+
+
+  const normalized =
+    String(value)
+      .trim()
+      .toLowerCase();
+
+
+  return [
+
+    "ano",
+    "yes",
+    "true",
+    "1",
+    "zaplaceno",
+    "paid",
+    "ok"
+
+  ].includes(
+    normalized
+  );
+
+}
+
+
+
+/* =========================================================
+   BEZPEČNÉ ZOBRAZENÍ TEXTU
+   ========================================================= */
+
+function escapeHtml(text) {
+
+  const div =
+    document.createElement(
+      "div"
+    );
+
+
+  div.textContent =
+    text ?? "";
+
+
+  return div.innerHTML;
+
+}
+
+
+
+/* =========================================================
+   SPUŠTĚNÍ PO NAČTENÍ STRÁNKY
+   ========================================================= */
+
+document.addEventListener(
+  "DOMContentLoaded",
+  function() {
+
+    /*
+      Zobrazíme skutečné číslo účtu
+      z konfigurace nahoře.
+    */
+
+    document
+      .getElementById(
+        "account-number"
+      )
+      .textContent =
+        ACCOUNT_NUMBER;
+
+
+    /*
+      QR platba
+    */
+
+    generatePaymentQR();
+
+
+    /*
+      Seznam spolužáků
+    */
+
+    loadParticipants();
+
+  }
+);
+
+</script>
+```
+
+## Google Sheet
+
+Do tabulky s přihlášenými spolužáky přidejte sloupec:
+
+```text
+ZAPLACENO
+```
+
+Příklad:
+
+```text
+Jméno             Účast      ZAPLACENO
+Pavel Přidal      ANO        ANO
+Jan Novák         ANO
+Jana Nováková     ANO        ANO
+Karel Svoboda     ANO
+```
+
+Na webu se potom automaticky zobrazí:
+
+```text
+Pavel Přidal      ✓ přijde      ✓ ZAPLACENO
+Jan Novák         ✓ přijde      ⏳ NEZAPLACENO
+Jana Nováková     ✓ přijde      ✓ ZAPLACENO
+Karel Svoboda     ✓ přijde      ⏳ NEZAPLACENO
+```
+
+## Po založení transparentního účtu
+
+V kódu změňte pouze:
+
+```javascript
+const ACCOUNT_NUMBER = "2700083483/2010";
+```
+
+například na:
+
+```javascript
+const ACCOUNT_NUMBER = "1234567890/2010";
+```
+
+QR kód se potom vytvoří automaticky a není potřeba nahrávat žádný obrázek `qr-platba.png`.
+
+Pro veřejný odkaz na transparentní účet ještě změňte:
+
+```html
+<a
+  id="transparentAccountLink"
+  href="#"
+```
+
+na například:
+
+```html
+<a
+  id="transparentAccountLink"
+  href="SEM-VLOZIT-ODKAZ-Z-FIO"
+```
